@@ -9,7 +9,7 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const findOrCreate = require("mongoose-findorcreate");
-
+const cookieSessions = require("cookie-sessions");
 
 
 const app = express();
@@ -55,19 +55,18 @@ passport.deserializeUser(function(id, done){
 });
 
 passport.use(new GoogleStrategy({
-    clientID: "92190912963-7vdap8ig7l2e173kubbc3gmnihl5nijd.apps.googleusercontent.com",
-    clientSecret: "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",
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
     callbackURL: "http://localhost:3000/auth/google/secrets",
     tokenURL: "http://oauth2.googleapis.com/token",
     userAuthorizationURL: "http://accounts.google.com/o/oauth2/auth",
     userProfileURL:"https://www.googleapis.com/auth/userinfo.profile"
   },
-  function(accessToken, refreshToken, profile, cb) {
+  function(access_token, refresh_token, profile, cb) {
 console.log(profile);
 
     User.findOrCreate({ googleId: profile.id }, function (err, user) {
       return cb(err, user);
-      
     });
   }
 ));
